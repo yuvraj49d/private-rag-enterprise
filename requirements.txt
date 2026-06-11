@@ -6,3 +6,5 @@ unstructured[pdf]==0.15.0
 fastapi==0.112.0
 uvicorn==0.30.5
 pydantic-setttings==2.4.0
+pytest==8.0.0
+pytest-mock==3.12.0
