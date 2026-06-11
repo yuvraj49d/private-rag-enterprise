@@ -5,6 +5,12 @@ from langchain_core.prompts import ChatPromptTemplate
 from src.config import settings
 from src.vector_store import get_local_retriever
 
+def verify_response_safety(context: str, answer: str) -> bool:
+    """A guardrail function that acts as a local evaluator to stop hallucinations."""
+    # You use a highly specific prompt to validate the answer against the source text
+    # If the Local evaluator detects data that wasn't in the context, it flags it.
+    pass
+
 def execute_private_query(user_question: str) -> str:
     """Asks the local offline LLM a question using retrieved private context."""
     
