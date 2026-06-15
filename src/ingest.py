@@ -1,4 +1,5 @@
-from langchain_community.document_loaders import DirectoryLoader, UnstructuredPDFLoader
+from langchain_community.document_loaders import DirectoryLoader
+from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from src.config import settings
 import os
@@ -13,9 +14,9 @@ def load_and_chunk_documents():
     
     # Strict local parsing
     loader = DirectoryLoader(
-        settings.DATA_DIR,
-        glob="**/*.pdf",
-        loader_cls=UnstructuredPDFLoader
+    settings.DATA_DIR,
+    glob="**/*.pdf",
+    loader_cls=PyPDFLoader
     )
 
     documents = loader.load()

@@ -19,13 +19,9 @@ def verify_response_safety(context: str, answer: str) -> bool:
 
 
 def execute_private_query(user_question: str) -> str:
-    """
-    Executes a secure RAG query against locally stored enterprise documents.
-    """
 
     print(f"\nReceived Question: {user_question}")
 
-    # Connect to local Ollama instance
     llm = Ollama(
         base_url=settings.OLLAMA_BASE_URL,
         model=settings.LOCAL_LLM_MODEL,
@@ -33,75 +29,54 @@ def execute_private_query(user_question: str) -> str:
 
     retriever = get_local_retriever()
 
-    # Debug retrieval output
-    try:
-        docs = retriever.invoke(user_question)
+    # Stage 1 Retrieval
+    retrieved_docs = retriever.invoke(user_question)
 
-        print("\n===== RETRIEVED DOCUMENTS =====")
+    print("\n===== INITIAL RETRIEVAL =====")
 
-        if not docs:
-            print("No documents retrieved!")
+    for idx, doc in enumerate(retrieved_docs):
+        print(f"\nDocument {idx + 1}")
+        print(doc.page_content[:300])
 
-        for idx, doc in enumerate(docs):
-            print(f"\n--- Document {idx + 1} ---")
-            print(doc.page_content[:1000])
+    # Stage 2 Reranking
+    from src.reranker import rerank_documents
 
-    except Exception as e:
-        print(f"Retriever Error: {e}")
-        raise
-
-    # System prompt
-    system_prompt = """
-    You are a secure corporate assistant.
-
-    Use ONLY the provided context to answer the user's question.
-
-    Rules:
-    - Do not invent facts.
-    - Do not use outside knowledge.
-    - If the answer is not present in the context, say:
-      "I do not know based on the provided documents."
-
-    Context:
-    {context}
-    """
-
-    prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", system_prompt),
-            ("human", "{input}"),
-        ]
+    reranked_docs = rerank_documents(
+        user_question,
+        retrieved_docs,
+        top_k=2
     )
 
-    # Create document QA chain
-    question_answer_chain = create_stuff_documents_chain(
-        llm,
-        prompt
+    print("\n===== RERANKED DOCUMENTS =====")
+
+    for idx, doc in enumerate(reranked_docs):
+        print(f"\nTop Document {idx + 1}")
+        print(doc.page_content[:300])
+
+    context = "\n\n".join(
+        [doc.page_content for doc in reranked_docs]
     )
 
-    # Create RAG chain
-    rag_chain = create_retrieval_chain(
-        retriever,
-        question_answer_chain
-    )
+    prompt = f"""
+You are a secure corporate assistant.
 
-    try:
-        response = rag_chain.invoke(
-            {
-                "input": user_question
-            }
-        )
+Use ONLY the provided context.
 
-        print("\n===== MODEL RESPONSE =====")
-        print(response)
+If the answer is not in the context,
+say:
 
-        answer = response.get(
-            "answer",
-            "No answer generated."
-        )
+"I do not know based on the provided documents."
 
-        return answer
+Context:
+{context}
 
-    except Exception as e:
-        print(f"RAG Chain Error: {e}")
-        raise
+Question:
+{user_question}
+"""
+
+    response = llm.invoke(prompt)
+
+    print("\n===== FINAL ANSWER =====")
+    print(response)
+
+    return response

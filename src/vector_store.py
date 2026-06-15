@@ -25,13 +25,22 @@ def build_local_vector_db():
     logger.info(f"Database successfully saved locally at: {settings.DB_DIR}")
     return vector_db
 
+
 def get_local_retriever():
-    """Loads the pre-built local database for quick querying."""
     logger.info("Connecting to persistent local ChromaDB instance...")
-    embeddings = HuggingFaceEmbeddings(model_name=settings.EMBEDDING_MODEL_NAME)
-    vector_db = Chroma (
+
+    embeddings = HuggingFaceEmbeddings(
+        model_name=settings.EMBEDDING_MODEL_NAME
+    )
+
+    vector_db = Chroma(
         persist_directory=settings.DB_DIR,
         embedding_function=embeddings
-
     )
-    return vector_db.as_retriever(search_kwargs={"k": 3})
+
+    print("\n===== VECTOR DB INFO =====")
+    print("Collection count:", vector_db._collection.count())
+
+    return vector_db.as_retriever(
+        search_kwargs={"k": 10}
+    )
