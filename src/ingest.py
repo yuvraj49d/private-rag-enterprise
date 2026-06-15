@@ -1,4 +1,4 @@
-from langchain_community.documents_loaders import DirectoryLoader, UnstructuredPDFLoader
+from langchain_community.document_loaders import DirectoryLoader, UnstructuredPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from src.config import settings
 import os

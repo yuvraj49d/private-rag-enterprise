@@ -34,7 +34,7 @@ def run_offline_ragas_evaluation():
     # Collect outputs from your active pipelines
     retriever = get_local_retriever()
 
-    for query in test queries:
+    for query in test_queries:
         logger.info(f"Evaluating pipeline response for query: '{query}'")
         
         # Pull raw answers
@@ -57,8 +57,8 @@ def run_offline_ragas_evaluation():
 
     # Define the exact industry evaluation metrics to score
     metrics = [
-        Faithfulness(1lm=evaluator_llm),
-        AnswerRelevance(1lm=evaluator_llm),
+        Faithfulness(llm=evaluator_llm),
+        AnswerRelevance(llm=evaluator_llm),
         ContextPrecision(llm=evaluator_llm, embeddings=evaluator_embeddings)
     ]
 

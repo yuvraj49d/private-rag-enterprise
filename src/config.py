@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     # Using lightweight open-source models
     EMBEDDING_MODEL_NAME: str = "BAAI/bge-small-en-v1.5"
-    LOCAL_LLM_MODEL: str = "llama3:8b"
+    LOCAL_LLM_MODEL: str = "qwen2.5:0.5b"
     OLLAMA_BASE_URL: str = "http://localhost:11434"
 
     # RAG Hyperparameters

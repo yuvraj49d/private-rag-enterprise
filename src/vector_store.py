@@ -8,7 +8,7 @@ def build_local_vector_db():
     """Generates local embeddings and saves them to a secure disk database."""
     logger.info("Initializing local HuggingFace embeddings...")
     # Computes purely on Local CPU/GPU via PyTorch
-    embeddings = HuggingFaceEmbeddings (model_name=settings.EMBEDDING_MODEL_NAME)
+    embeddings = HuggingFaceEmbeddings(model_name=settings.EMBEDDING_MODEL_NAME)
 
     chunks = load_and_chunk_documents()
     if not chunks:
@@ -28,7 +28,7 @@ def build_local_vector_db():
 def get_local_retriever():
     """Loads the pre-built local database for quick querying."""
     logger.info("Connecting to persistent local ChromaDB instance...")
-    embeddings = HuggingFaceEmbeddings (model_name=settings.EMBEDDING_MODEL_NAME)
+    embeddings = HuggingFaceEmbeddings(model_name=settings.EMBEDDING_MODEL_NAME)
     vector_db = Chroma (
         persist_directory=settings.DB_DIR,
         embedding_function=embeddings
