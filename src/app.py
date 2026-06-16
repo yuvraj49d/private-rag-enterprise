@@ -3,7 +3,11 @@ from pydantic import BaseModel
 from src.llm_pipeline import execute_private_query
 from src.vector_store import build_local_vector_db
 
-app = FastAPI(title="Secure Enterprise RAG API")
+app = FastAPI(
+    title="Secure Enterprise RAG API",
+    description="Offline Enterprise Retrieval-Augmented Generation System",
+    version="1.0.0"
+)
 
 class QueryRequest (BaseModel):
     question: str
@@ -25,3 +29,10 @@ async def trigger_ingestion (background_tasks: BackgroundTasks):
     """Triggers document processing in the background so the API doesn't freeze."""
     background_tasks.add_task(build_local_vector_db)
     return {"status": "accepted", "message": "Ingestion pipeline running in background."}
+
+@app.get("/health")
+async def health_check():
+    return {
+        "status": "healthy",
+        "service": "private-rag-enterprise"
+    }
