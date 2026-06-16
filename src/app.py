@@ -12,8 +12,11 @@ class QueryRequest (BaseModel):
 async def secure_query_endpoint (request: QueryRequest):
     """Production asynchronous API endpoint for secure querying."""
     try:
-        answer = execute_private_query(request.question)
-        return {"status": "success", "data": {"answer": answer}}
+        result = execute_private_query(request.question)
+        return {
+            "status": "success",
+            "data": result
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 

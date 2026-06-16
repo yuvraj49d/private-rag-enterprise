@@ -5,7 +5,7 @@ import numpy as np
 reranker_model = CrossEncoder("BAAI/bge-reranker-base")
 
 
-def rerank_documents(query: str, retrieved_docs: list, top_k: int = 2):
+def rerank_documents(query: str, retrieved_docs: list, top_k: int = 4):
     """
     Re-rank retrieved documents using a CrossEncoder.
     """

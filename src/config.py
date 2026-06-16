@@ -8,8 +8,8 @@ class Settings(BaseSettings):
     OLLAMA_BASE_URL: str = "http://localhost:11434"
 
     # RAG Hyperparameters
-    CHUNK_SIZE: int = 500
-    CHUNK_OVERLAP: int = 50
+    CHUNK_SIZE: int = 800
+    CHUNK_OVERLAP: int = 150
 
     # Local storage paths
     DATA_DIR: str = "data/"

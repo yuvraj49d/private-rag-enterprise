@@ -18,7 +18,7 @@ def verify_response_safety(context: str, answer: str) -> bool:
     return True
 
 
-def execute_private_query(user_question: str) -> str:
+def execute_private_query(user_question: str):
 
     print(f"\nReceived Question: {user_question}")
 
@@ -41,11 +41,7 @@ def execute_private_query(user_question: str) -> str:
     # Stage 2 Reranking
     from src.reranker import rerank_documents
 
-    reranked_docs = rerank_documents(
-        user_question,
-        retrieved_docs,
-        top_k=2
-    )
+    reranked_docs = retrieved_docs[:2]
 
     print("\n===== RERANKED DOCUMENTS =====")
 
@@ -60,18 +56,24 @@ def execute_private_query(user_question: str) -> str:
     prompt = f"""
 You are a secure corporate assistant.
 
-Use ONLY the provided context.
+Answer ONLY from the provided context.
 
-If the answer is not in the context,
-say:
+If the answer can be reasonably inferred from the context,
+provide a concise answer.
+
+Only respond with:
 
 "I do not know based on the provided documents."
+
+when the context contains no relevant information.
 
 Context:
 {context}
 
 Question:
 {user_question}
+
+Answer:
 """
 
     response = llm.invoke(prompt)
@@ -79,4 +81,17 @@ Question:
     print("\n===== FINAL ANSWER =====")
     print(response)
 
-    return response
+    sources = []
+
+    for doc in reranked_docs:
+        sources.append(
+            {
+                "page": doc.metadata.get("page", "Unknown"),
+                "source": doc.metadata.get("source", ""),
+                "snippet": doc.page_content[:300]
+            }
+        )
+    return {
+        "answer": response,
+        "sources": sources
+    }
