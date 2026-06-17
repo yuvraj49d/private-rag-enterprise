@@ -1,8 +1,11 @@
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_community.vectorstores import Chroma
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_chroma import Chroma
 from src.config import settings
 from src.ingest import load_and_chunk_documents
 from src.logger import logger
+
+import shutil
+import os
 
 embeddings = HuggingFaceEmbeddings(
     model_name=settings.EMBEDDING_MODEL_NAME
@@ -20,6 +23,10 @@ def build_local_vector_db():
         return None
 
     logger.info(f"Indexing {len(chunks)} chunks into local ChromaDB...")
+    if os.path.exists(settings.DB_DIR):
+        logger.info("Removing existing vector database...")
+        shutil.rmtree(settings.DB_DIR)
+
     vector_db = Chroma.from_documents(
         documents=chunks,
         embedding=embeddings,
@@ -31,7 +38,15 @@ def build_local_vector_db():
 
 
 def get_local_retriever():
-    logger.info("Connecting to persistent local ChromaDB instance...")
+
+    logger.info(
+        "Connecting to persistent local ChromaDB instance..."
+    )
+
+    if not os.path.exists(settings.DB_DIR):
+        raise Exception(
+            "Vector DB not found. Run document ingestion first."
+        )
 
     vector_db = Chroma(
         persist_directory=settings.DB_DIR,
@@ -42,5 +57,5 @@ def get_local_retriever():
     print("Collection count:", vector_db._collection.count())
 
     return vector_db.as_retriever(
-        search_kwargs={"k": 10}
+        search_kwargs={"k": 4}
     )

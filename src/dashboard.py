@@ -84,9 +84,11 @@ with col1:
 
                     if metrics:
                         st.caption(
-                            f"Latency: {metrics['latency_seconds']}s | "
-                            f"Retrieved: {metrics['retrieved_docs']} docs | "
-                            f"Used: {metrics['reranked_docs']} docs"
+                            f"Total: {metrics['latency_seconds']}s | "
+                            f"Retrieval: {metrics['retrieval_seconds']}s | "
+                            f"LLM: {metrics['llm_seconds']}s | "
+                            f"Retrieved: {metrics['retrieved_docs']} | "
+                            f"Used: {metrics['reranked_docs']}"
                         )
 
                     with st.expander("View Sources"):

@@ -33,7 +33,18 @@ def execute_private_query(
     # -------------------------
     # Retrieval
     # -------------------------
+    retrieval_start = time.time()
+
     retrieved_docs = retriever.invoke(user_question)
+
+    retrieval_time = round(
+        time.time() - retrieval_start,
+        2
+    )
+
+    print(
+        f"\nRetrieval Time: {retrieval_time}s"
+    )
 
     print("\n===== INITIAL RETRIEVAL =====")
 
@@ -44,7 +55,15 @@ def execute_private_query(
     # -------------------------
     # Simple reranking
     # -------------------------
-    reranked_docs = retrieved_docs[:2]
+    from src.reranker import (
+    rerank_documents
+    )
+
+    reranked_docs = rerank_documents(
+        query=user_question,
+        retrieved_docs=retrieved_docs,
+        top_k=3
+    )
 
     print("\n===== RETRIEVAL STATS =====")
     print("Retrieved Docs:", len(retrieved_docs))
@@ -60,7 +79,10 @@ def execute_private_query(
     # Build Context
     # -------------------------
     context = "\n\n".join(
-        [doc.page_content for doc in reranked_docs]
+        [
+            doc.page_content[:400]
+            for doc in reranked_docs
+        ]
     )
 
     # -------------------------
@@ -105,7 +127,18 @@ Current Question:
 Answer:
 """
 
+    llm_start = time.time()
+
     response = llm.invoke(prompt)
+
+    llm_time = round(
+        time.time() - llm_start,
+        2
+    )
+
+    print(
+        f"\nLLM Time: {llm_time}s"
+    )
 
     print("\n===== FINAL ANSWER =====")
     print(response)
@@ -144,6 +177,8 @@ Answer:
         "sources": sources,
         "metrics": {
             "latency_seconds": elapsed,
+            "retrieval_seconds": retrieval_time,
+            "llm_seconds": llm_time,
             "retrieved_docs": len(retrieved_docs),
             "reranked_docs": len(reranked_docs)
         }
