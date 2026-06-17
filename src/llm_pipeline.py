@@ -1,8 +1,9 @@
-from langchain_community.llms import Ollama
+from langchain_ollama import OllamaLLM
 from src.config import settings
 from src.vector_store import get_local_retriever
 import time
 import os
+from src.hybrid_retriever import hybrid_retrieve
 
 def verify_response_safety(context: str, answer: str) -> bool:
     """
@@ -23,9 +24,9 @@ def execute_private_query(
 
     print(f"\nReceived Question: {user_question}")
 
-    llm = Ollama(
+    llm = OllamaLLM(
         base_url=settings.OLLAMA_BASE_URL,
-        model=settings.LOCAL_LLM_MODEL,
+        model=settings.LOCAL_LLM_MODEL
     )
 
     retriever = get_local_retriever()
@@ -35,7 +36,7 @@ def execute_private_query(
     # -------------------------
     retrieval_start = time.time()
 
-    retrieved_docs = retriever.invoke(user_question)
+    retrieved_docs = hybrid_retrieve(user_question)
 
     retrieval_time = round(
         time.time() - retrieval_start,
@@ -62,7 +63,7 @@ def execute_private_query(
     reranked_docs = rerank_documents(
         query=user_question,
         retrieved_docs=retrieved_docs,
-        top_k=3
+        top_k=2
     )
 
     print("\n===== RETRIEVAL STATS =====")
