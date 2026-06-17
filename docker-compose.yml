@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+
+  rag-api:
+    build: .
+    container_name: private-rag-api
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - ./data:/app/data
+      - ./vectorstore:/app/vectorstore
+
+    environment:
+      - PYTHONUNBUFFERED=1
+
+    restart: unless-stopped
+
+  rag-dashboard:
+    build: .
+
+    container_name: private-rag-dashboard
+
+    command: >
+      streamlit run src/dashboard.py
+      --server.address=0.0.0.0
+      --server.port=8501
+
+    ports:
+      - "8501:8501"
+
+    volumes:
+      - ./data:/app/data
+      - ./vectorstore:/app/vectorstore
+
+    depends_on:
+      - rag-api
+
+    restart: unless-stopped

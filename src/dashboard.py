@@ -1,7 +1,3 @@
-import streamlit as st
-from src.llm_pipeline import execute_private_query
-from src.vector_store import build_local_vector_db
-# from src.evaluator import run_offline_ragas_evaluation
 import sys
 import os
 
@@ -12,6 +8,11 @@ sys.path.append(
         )
     )
 )
+
+import streamlit as st
+
+from src.llm_pipeline import execute_private_query
+from src.vector_store import build_local_vector_db
 
 os.makedirs("data", exist_ok=True)
 
@@ -46,6 +47,9 @@ with col1:
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []
+
     # Display chat history
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]): 
@@ -60,31 +64,57 @@ with col1:
         # Process via our backend pipeline Layout
         with st.spinner("Retrieving local context and generating response..."):
             try:
-                result = execute_private_query(user_query)
+                result = execute_private_query(
+                    user_query,
+                    st.session_state.get(
+                        "chat_history",
+                        []
+                    )
+                )
 
                 answer = result["answer"]
                 sources = result["sources"]
+                metrics = result.get("metrics", {})
 
                 with st.chat_message("assistant"):
 
                     st.markdown(answer)
+
+                    metrics = result.get("metrics", {})
+
+                    if metrics:
+                        st.caption(
+                            f"Latency: {metrics['latency_seconds']}s | "
+                            f"Retrieved: {metrics['retrieved_docs']} docs | "
+                            f"Used: {metrics['reranked_docs']} docs"
+                        )
 
                     with st.expander("View Sources"):
 
                         for source in sources:
 
                             st.markdown(
-                                f"### Page {source['page']}"
+                                f"### {source['document']}"
+                            )
+
+                            st.markdown(
+                                f"**Page:** {source['page']}"
                             )
 
                             st.code(
                                 source["snippet"]
                             )
-
                 st.session_state.messages.append(
                     {
                         "role": "assistant",
                         "content": answer
+                    }
+                )
+
+                st.session_state.chat_history.append(
+                    {
+                        "question": user_query,
+                        "answer": answer
                     }
                 )
             except Exception as e:

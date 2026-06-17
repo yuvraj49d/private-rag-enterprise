@@ -31,8 +31,18 @@ async def trigger_ingestion (background_tasks: BackgroundTasks):
     return {"status": "accepted", "message": "Ingestion pipeline running in background."}
 
 @app.get("/health")
-async def health_check():
+async def health():
     return {
         "status": "healthy",
-        "service": "private-rag-enterprise"
+        "model": settings.LOCAL_LLM_MODEL,
+        "embedding": settings.EMBEDDING_MODEL_NAME
+    }
+
+@app.get("/metrics")
+async def metrics():
+    return {
+        "documents": len([
+            f for f in os.listdir("data")
+            if f.endswith(".pdf")
+        ])
     }

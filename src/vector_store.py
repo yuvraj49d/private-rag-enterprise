@@ -4,6 +4,10 @@ from src.config import settings
 from src.ingest import load_and_chunk_documents
 from src.logger import logger
 
+embeddings = HuggingFaceEmbeddings(
+    model_name=settings.EMBEDDING_MODEL_NAME
+)
+
 def build_local_vector_db():
     """Generates local embeddings and saves them to a secure disk database."""
     logger.info("Initializing local HuggingFace embeddings...")
@@ -28,10 +32,6 @@ def build_local_vector_db():
 
 def get_local_retriever():
     logger.info("Connecting to persistent local ChromaDB instance...")
-
-    embeddings = HuggingFaceEmbeddings(
-        model_name=settings.EMBEDDING_MODEL_NAME
-    )
 
     vector_db = Chroma(
         persist_directory=settings.DB_DIR,
