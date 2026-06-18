@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: private-rag
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: private-rag
+
+  template:
+    metadata:
+      labels:
+        app: private-rag
+
+    spec:
+      containers:
+
+      - name: private-rag
+
+        image: your-dockerhub-username/private-rag:latest
+
+        ports:
+        - containerPort: 8000
+
+        envFrom:
+        - configMapRef:
+            name: private-rag-config

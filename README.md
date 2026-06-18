@@ -147,6 +147,26 @@ Using the `Ragas` layer, the system programmatically executes automated benchmar
 
 ---
 
+## Kubernetes Deployment
+
+The application supports containerized deployment through Kubernetes.
+
+```bash
+kubectl apply -f k8s/configmap.yaml
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
+```
+
+Resources:
+
+* Deployment
+* Service
+* ConfigMap
+
+This enables scalable deployment of the FastAPI-based RAG platform in Kubernetes environments.
+
+---
+
 ## How to Execute the Application (Laptop Deployment)
 
 ### Running the Backend REST API
@@ -171,6 +191,8 @@ streamlit run src/dashboard.py
 | RAGAS Answer Relevancy   | 0.83          |
 | Deployment Mode          | Fully Offline |
 
+---
+
 ## Engineering Improvements Implemented
 
 * Reduced retrieval latency from ~19s to ~0.05s using BM25 index caching.
@@ -180,6 +202,8 @@ streamlit run src/dashboard.py
 * Added source-grounded responses with page-level citations.
 * Integrated RAGAS evaluation pipeline for automated quality validation.
 * Added FastAPI and Streamlit interfaces for API and UI access.
+
+---
 
 ## Screenshots
 

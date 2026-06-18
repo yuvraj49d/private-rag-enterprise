@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: private-rag-config
+
+data:
+  LOCAL_LLM_MODEL: "qwen2.5:1.5b"
+  EMBEDDING_MODEL_NAME: "BAAI/bge-small-en-v1.5"
