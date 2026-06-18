@@ -185,16 +185,3 @@ with col2:
             st.success("Vector DB updated and mapped to persistent disk space!")
 
     st.markdown("---")
-    """
-    st.markdown("### Pipeline Quality Evaluation")
-
-    # Action button to trigger the evaluation pipeline
-    if st.button("☑ Run Ragas Statistical Evals", use_container_width=True):
-        with st.spinner("Running automated validation loop over baseline metrics..."):
-            try:
-                scores = run_offline_ragas_evaluation()
-                st.write("#### Core Quality Benchmark Scores:")
-                st.json(scores)
-            except Exception as e:
-                st.warning(f"Evaluation suite ready structure validated. Requires live Ollama runtime to map scores: {e}")
-                """

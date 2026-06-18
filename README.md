@@ -1,3 +1,8 @@
+![Python](https://img.shields.io/badge/Python-3.11-blue)
+![LangChain](https://img.shields.io/badge/LangChain-RAG-green)
+![ChromaDB](https://img.shields.io/badge/VectorDB-Chroma-orange)
+![Ollama](https://img.shields.io/badge/LLM-Ollama-red)
+![License](https://img.shields.io/badge/License-MIT-yellow)
 
 # Enterprise Private RAG: Secure Offline Document Intelligence Pipeline
 
@@ -175,3 +180,17 @@ streamlit run src/dashboard.py
 * Added source-grounded responses with page-level citations.
 * Integrated RAGAS evaluation pipeline for automated quality validation.
 * Added FastAPI and Streamlit interfaces for API and UI access.
+
+## Screenshots
+
+### Streamlit Dashboard
+
+![Dashboard](docs/screenshots/dashboard_home.png)
+
+### Query Response
+
+![Query](docs/screenshots/query_response.png)
+
+### FastAPI Swagger
+
+![API](docs/screenshots/swagger_ui.png)
