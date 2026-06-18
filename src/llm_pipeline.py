@@ -2,6 +2,8 @@ from langchain_ollama import OllamaLLM
 from src.config import settings
 from src.vector_store import get_local_retriever
 import time
+import json
+from datetime import datetime
 import os
 from src.hybrid_retriever import hybrid_retrieve
 
@@ -172,6 +174,30 @@ Answer:
     print(
         f"\nQuery completed in {elapsed} seconds"
     )
+
+    os.makedirs("logs", exist_ok=True)
+
+    with open(
+        "logs/query_logs.jsonl",
+        "a",
+        encoding="utf-8"
+    ) as f:
+
+        f.write(
+            json.dumps(
+                {
+                    "timestamp": str(datetime.now()),
+                    "question": user_question,
+                    "answer_length": len(response),
+                    "retrieved_docs": len(retrieved_docs),
+                    "reranked_docs": len(reranked_docs),
+                    "retrieval_time": retrieval_time,
+                    "llm_time": llm_time,
+                    "total_time": elapsed
+                }
+            )
+            + "\n"
+        )
 
     return {
         "answer": response,

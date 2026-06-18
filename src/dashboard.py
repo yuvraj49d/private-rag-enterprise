@@ -1,5 +1,6 @@
 import sys
 import os
+import json
 
 sys.path.append(
     os.path.dirname(
@@ -29,6 +30,24 @@ with st.sidebar:
     st.info("Embedding: BAAI/bge-small-en-v1.5")
 
     st.markdown("---")
+    st.subheader("Analytics")
+
+    log_count = 0
+
+    if os.path.exists("logs/query_logs.jsonl"):
+
+        with open(
+            "logs/query_logs.jsonl",
+            "r",
+            encoding="utf-8"
+        ) as f:
+
+            log_count = len(f.readlines())
+
+    st.metric(
+        "Total Queries",
+        log_count
+    )
 
     st.success("Vector Database: Connected")
 

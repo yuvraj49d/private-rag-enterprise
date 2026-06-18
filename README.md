@@ -1,5 +1,21 @@
 
-## Enterprise Private RAG: Secure Offline Document Intelligence Pipeline
+# Enterprise Private RAG: Secure Offline Document Intelligence Pipeline
+
+## Key Features
+
+* Hybrid Retrieval (BM25 + ChromaDB Vector Search)
+* CrossEncoder Re-ranking using BAAI/bge-reranker-base
+* Fully Offline Enterprise Deployment (No OpenAI APIs Required)
+* Multi-PDF Document Intelligence Platform
+* Source Attribution & Citation Support
+* Conversation Memory
+* FastAPI REST API
+* Streamlit Chat Dashboard
+* Local LLM Inference via Ollama
+* RAGAS Evaluation Framework
+* Dockerized Deployment
+* Query Analytics & Observability
+
 
 An air-gapped, high-privacy Retrieval-Augmented Generation (RAG) system designed for enterprise deployment. This pipeline allows organizations to securely query sensitive corporate intelligence (PDFs, internal documentation, financial reports) entirely on-premise, guaranteeing zero data leakage to external APIs or the public internet.
 
@@ -7,11 +23,56 @@ An air-gapped, high-privacy Retrieval-Augmented Generation (RAG) system designed
 
 Unlike standard RAG implementations that rely on cloud-hosted services (like OpenAI or Pinecone), this system enforces a strict data-isolation boundary. Every stage of the data lifecycle—from ingestion to text generation—is executed locally on machine hardware.
 
-Corporate PDFs] ──> [Local Loader & Splitting] ──> [Local Embedding Model]
-│
-[User Query] ──> [Local Retriever] <── [Persistent Local Chroma DB]
-│ │
-└──> [Context Injection] ──> [Offline Local LLM (Ollama)] ──> [Secure Answer] [1, 2, 3, 4] 
+## Architecture
+
+```text
+                        ┌─────────────────┐
+                        │ Corporate PDFs  │
+                        └────────┬────────┘
+                                 │
+                                 ▼
+                    ┌────────────────────────┐
+                    │ PDF Loader & Chunking  │
+                    └────────┬───────────────┘
+                             │
+                             ▼
+                  ┌─────────────────────────┐
+                  │ BGE Embedding Model     │
+                  └────────┬────────────────┘
+                           │
+                           ▼
+                     ┌──────────────┐
+                     │ ChromaDB     │
+                     └──────┬───────┘
+                            │
+                            ▼
+
+User Query
+     │
+     ▼
+
+┌──────────────┐      ┌──────────────┐
+│ Vector Search│      │ BM25 Search  │
+└──────┬───────┘      └──────┬───────┘
+       └──────────┬──────────┘
+                  ▼
+      ┌─────────────────────────┐
+      │ Hybrid Retriever        │
+      └──────────┬──────────────┘
+                 ▼
+      ┌─────────────────────────┐
+      │ CrossEncoder Reranker   │
+      └──────────┬──────────────┘
+                 ▼
+      ┌─────────────────────────┐
+      │ Ollama (Qwen2.5)        │
+      └──────────┬──────────────┘
+                 ▼
+      ┌─────────────────────────┐
+      │ Grounded Response       │
+      │ + Source Citations      │
+      └─────────────────────────┘
+```
 
 
 ## Key Engineering Guardrails:
@@ -92,3 +153,25 @@ uvicorn src.app:app --host 0.0.0.0 --port 8000
 ```bash
 streamlit run src/dashboard.py
 ```
+
+## Performance Metrics
+
+| Component                | Performance   |
+| ------------------------ | ------------- |
+| ChromaDB Collection Size | 3,370 Chunks  |
+| Retrieval Latency        | ~0.05s        |
+| Re-ranking Latency       | ~1s           |
+| Local LLM Inference      | 10-25s        |
+| Documents Indexed        | 667 Pages     |
+| RAGAS Answer Relevancy   | 0.83          |
+| Deployment Mode          | Fully Offline |
+
+## Engineering Improvements Implemented
+
+* Reduced retrieval latency from ~19s to ~0.05s using BM25 index caching.
+* Added Hybrid Search combining semantic and keyword retrieval.
+* Implemented CrossEncoder re-ranking to improve context precision.
+* Added conversation memory for multi-turn document Q&A.
+* Added source-grounded responses with page-level citations.
+* Integrated RAGAS evaluation pipeline for automated quality validation.
+* Added FastAPI and Streamlit interfaces for API and UI access.

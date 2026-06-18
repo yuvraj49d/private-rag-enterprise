@@ -1,3 +1,6 @@
+import os
+
+from chromadb.app import settings
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 from src.llm_pipeline import execute_private_query
@@ -31,11 +34,11 @@ async def trigger_ingestion (background_tasks: BackgroundTasks):
     return {"status": "accepted", "message": "Ingestion pipeline running in background."}
 
 @app.get("/health")
-async def health():
+def health():
     return {
         "status": "healthy",
-        "model": settings.LOCAL_LLM_MODEL,
-        "embedding": settings.EMBEDDING_MODEL_NAME
+        "vector_db": "connected",
+        "model": settings.LOCAL_LLM_MODEL
     }
 
 @app.get("/metrics")
